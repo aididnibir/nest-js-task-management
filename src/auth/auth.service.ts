@@ -73,6 +73,22 @@ export class AuthService {
     }
   }
 
+  async getLoggedInUserDetails(userId: string): Promise<Partial<Users>> {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const loggedInUserDetails = {
+      id: user.id,
+      email: user.email,
+      userName: user.userName,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phoneNumber: user.phoneNumber,
+    };
+    return loggedInUserDetails;
+  }
+
   async userLogin(loginUserDto: LoginUserDto): Promise<object> {
     const { credential, password } = loginUserDto;
 
@@ -94,7 +110,11 @@ export class AuthService {
     } else {
       const payload: JwtPayload = { userName: credential, email: credential };
       const accessToken = this.jwtService.sign(payload);
-      return { accessToken };
+      const authUserDetails = await this.getLoggedInUserDetails(
+        isExistingUser.id,
+      );
+
+      return { accessToken, user: authUserDetails };
     }
   }
 }

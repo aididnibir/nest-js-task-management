@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 
 import { Task } from './task.entity';
+import { Logger } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Users } from 'src/auth/user.entity';
 import { TasksService } from './tasks.service';
@@ -22,6 +23,7 @@ import { UpdateTaskStatusDto } from './dto/update.task.status.dto';
 @Controller('tasks')
 @UseGuards(AuthGuard('jwt'))
 export class TasksController {
+  logger = new Logger('TasksController');
   constructor(private taskService: TasksService) {}
 
   @Get()
